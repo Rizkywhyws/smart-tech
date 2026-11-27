@@ -5,7 +5,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PasswordController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use Inertia\Inertia;
+use Inertia\Middleware\EncryptHistory;
 
 Route::get('/', fn() => Inertia::render('LandingPage'))->name('home');
 
@@ -20,7 +22,7 @@ Route::middleware('guest')->group(function () {
         ->name('register.admin');
 });
 
-Route::middleware(['auth', 'auth.session'])->group(function () {
+Route::middleware(['auth', 'auth.session', EncryptHistory::class])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::get('/ganti-sandi', [PasswordController::class, 'edit'])->name('password.change');
@@ -32,10 +34,14 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
         Route::middleware('role:admin')->prefix('admin')->group(function () {
+            Route::get('/', AdminDashboardController::class)->name('admin.dashboard');
             Route::get('/pengguna', [UserController::class, 'index'])->name('admin.users');
-            Route::post('/pengguna', [UserController::class, 'store']);
-            Route::put('/pengguna/{user}/password', [UserController::class, 'resetPassword']);
-            Route::delete('/pengguna/{user}', [UserController::class, 'destroy']);
+            Route::post('/pengguna', [UserController::class, 'store'])
+                ->middleware('throttle:30,1');
+            Route::put('/pengguna/{user}/password', [UserController::class, 'resetPassword'])
+                ->middleware('throttle:20,1');
+            Route::delete('/pengguna/{user}', [UserController::class, 'destroy'])
+                ->middleware('throttle:20,1');
         });
     });
 });

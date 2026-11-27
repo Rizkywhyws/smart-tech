@@ -14,7 +14,7 @@ class DashboardController extends Controller
         $user = $request->user();
 
         if ($user->role === 'admin') {
-            return redirect()->route('admin.users');
+            return redirect()->route('admin.dashboard');
         }
 
         return Inertia::render('Dashboard', [

@@ -82,7 +82,7 @@ class AuthController extends Controller
         }
 
         Auth::login($user, $request->boolean('remember'));
-        $request->session()->regenerate(); 
+        $request->session()->regenerate();
 
         return redirect()->intended(route('dashboard'));
     }
@@ -147,12 +147,15 @@ class AuthController extends Controller
         return redirect()->route('dashboard');
     }
 
+
     public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
+        Inertia::clearHistory();
 
         return redirect('/');
     }

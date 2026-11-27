@@ -114,4 +114,15 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Setup Key
+    |--------------------------------------------------------------------------
+    |
+    | Kode rahasia untuk mendaftarkan admin pertama lewat halaman login.
+    | Kosongkan di .env untuk menonaktifkan pendaftaran admin.
+    |
+    */
+
+    'admin_setup_key' => env('ADMIN_SETUP_KEY'),
 ];

@@ -13,6 +13,7 @@ const pages = import.meta.glob("./Pages/**/*.jsx", { eager: true });
 
 createInertiaApp({
     title: (title) => title || "SmartTech",
+    progress: false, 
     resolve: (name) => {
         const page = pages[`./Pages/${name}.jsx`];
         if (!page) throw new Error(`Halaman Inertia tidak ditemukan: ${name}`);
@@ -26,4 +27,4 @@ createInertiaApp({
             </>,
         );
     },
-});
+});    

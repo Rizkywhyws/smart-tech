@@ -161,4 +161,61 @@ class AuthSecurityTest extends TestCase
         $this->assertTrue($siswa->fresh()->must_change_password);
         $this->assertFalse(Hash::check('Rahasia123', $siswa->fresh()->password));
     }
+    public function test_siswa_tidak_bisa_membuat_akun(): void
+    {
+        $this->actingAs($this->makeUser())
+            ->post('/admin/pengguna', [
+                'name' => 'Penyusup',
+                'role' => 'admin',
+                'identifier' => '999',
+                'password' => 'Rahasia123',
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('users', ['identifier' => '999']);
+    }
+
+    public function test_admin_membuat_akun_dengan_sandi_sementara(): void
+    {
+        $admin = $this->makeUser('admin', ['identifier' => null, 'email' => 'a@contoh.ac.id']);
+
+        $this->actingAs($admin)
+            ->post('/admin/pengguna', [
+                'name' => 'Nadia Putri',
+                'role' => 'siswa',
+                'identifier' => '2026104099',
+                'email' => '',
+                'password' => '',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertSessionHas('generated');
+
+        $this->assertDatabaseHas('users', [
+            'identifier' => '2026104099',
+            'role' => 'siswa',
+            'must_change_password' => true,
+        ]);
+    }
+
+    public function test_peran_tidak_valid_ditolak(): void
+    {
+        $admin = $this->makeUser('admin', ['identifier' => null, 'email' => 'a@contoh.ac.id']);
+
+        $this->actingAs($admin)
+            ->post('/admin/pengguna', ['name' => 'X', 'role' => 'superadmin', 'identifier' => '1'])
+            ->assertSessionHasErrors('role');
+    }
+
+    public function test_nama_berisi_html_disimpan_sebagai_teks_biasa(): void
+    {
+        $admin = $this->makeUser('admin', ['identifier' => null, 'email' => 'a@contoh.ac.id']);
+
+        $this->actingAs($admin)->post('/admin/pengguna', [
+            'name' => '<script>alert(1)</script>',
+            'role' => 'siswa',
+            'identifier' => '2026104100',
+        ])->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('users', ['name' => '<script>alert(1)</script>']);
+    }
 }

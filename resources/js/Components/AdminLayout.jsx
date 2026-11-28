@@ -17,7 +17,7 @@ import useTheme from "../hooks/useTheme";
 
 const NAV = [
     {
-        label: "Ringkasan",
+        label: "Dashboard",
         href: "/admin",
         icon: LayoutDashboard,
         active: (url) => url === "/admin" || url.startsWith("/admin?"),

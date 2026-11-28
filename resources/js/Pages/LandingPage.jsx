@@ -10,10 +10,11 @@ import {
     Clock,
     FileText,
     GraduationCap,
-    Landmark,
     LogIn,
     Menu,
     Moon,
+    Presentation,
+    ShieldCheck,
     Sun,
     TrendingUp,
     Video,
@@ -22,7 +23,7 @@ import {
 
 const NAV_LINKS = [
     { href: "#fitur", label: "Fitur" },
-    { href: "#jenjang", label: "Jenjang" },
+    { href: "#pengguna", label: "Pengguna" },
 ];
 
 const HERO_POINTS = [
@@ -33,33 +34,33 @@ const HERO_POINTS = [
 
 const SCHEDULE = [
     {
-        time: "08.00",
-        title: "Pemrograman Web",
-        place: "Ruang 3.2",
+        time: "07.00",
+        title: "Matematika",
+        place: "Kelas XI IPA 1 · Ruang 3.2",
         mode: "Tatap muka",
         now: true,
     },
     {
-        time: "10.30",
-        title: "Basis Data",
-        place: "Tautan kelas daring",
-        mode: "Daring",
+        time: "08.30",
+        title: "Bahasa Indonesia",
+        place: "Kelas XI IPA 1 · Ruang 3.2",
+        mode: "Tatap muka",
     },
     {
-        time: "13.00",
-        title: "Statistika",
-        place: "Ruang 2.1",
-        mode: "Tatap muka",
+        time: "10.15",
+        title: "Fisika",
+        place: "Laboratorium IPA",
+        mode: "Praktikum",
     },
 ];
 
 const MATERI = [
     {
         icon: Video,
-        title: "Pertemuan 5: Routing dan controller",
+        title: "Bab 5: Persamaan dan fungsi kuadrat",
         type: "Video",
     },
-    { icon: FileText, title: "Modul praktikum Laravel", type: "PDF" },
+    { icon: FileText, title: "Modul Matematika kelas XI", type: "PDF" },
     { icon: FileText, title: "Ringkasan materi minggu ini", type: "Slide" },
 ];
 
@@ -69,42 +70,52 @@ const BARS = [
     { label: "Tugas 1", value: 52 },
     { label: "Tugas 2", value: 64 },
     { label: "Kuis", value: 58 },
-    { label: "UTS", value: 78 },
+    { label: "PTS", value: 78 },
     { label: "Tugas 3", value: 88 },
 ];
 
-const JENJANG = [
+const PENGGUNA = [
     {
         icon: Backpack,
-        title: "Untuk Sekolah (SMP / SMA / SMK)",
-        text: "Kelola jadwal pelajaran harian, latihan soal ujian sekolah, tugas proyek, dan pantauan wali kelas.",
-        cta: "Jelajahi fitur pembelajaran",
+        title: "Siswa",
+        text: "Satu tempat untuk semua kebutuhan belajar, dari jadwal pelajaran sampai rapor.",
         points: [
-            "Jadwal pelajaran harian",
-            "Latihan soal ujian sekolah",
-            "Tugas proyek dan pantauan wali kelas",
+            "Lihat jadwal pelajaran harian",
+            "Akses materi dan kumpulkan tugas",
+            "Pantau nilai dan presensi",
         ],
     },
     {
-        icon: Landmark,
-        title: "Untuk Perguruan Tinggi",
-        text: "Terintegrasi dengan KRS semester, forum diskusi mata kuliah, presensi kelas, dan bimbingan tugas akhir.",
-        cta: "Jelajahi fitur pembelajaran",
+        icon: Presentation,
+        title: "Guru dan Wali Kelas",
+        text: "Kelola kegiatan belajar mengajar dan pantau perkembangan siswa dengan lebih mudah.",
         points: [
-            "KRS semester",
-            "Forum diskusi mata kuliah",
-            "Presensi kelas dan bimbingan tugas akhir",
+            "Unggah materi dan buat tugas",
+            "Catat presensi dan input nilai",
+            "Pantau siswa perwalian",
+        ],
+    },
+    {
+        icon: ShieldCheck,
+        title: "Admin Sekolah",
+        text: "Kendali penuh atas akun dan data sekolah, dengan akses yang aman dan terkelola.",
+        points: [
+            "Buat dan kelola akun siswa dan guru",
+            "Atur kelas dan mata pelajaran",
+            "Pantau aktivitas portal sekolah",
         ],
     },
 ];
 
 const LOGIN_URL = "/login";
+const LOGIN_LABEL = "Login";
+
 const FOOTER_COLUMNS = [
     {
         title: "Platform",
         links: [
             { href: "#fitur", label: "Fitur" },
-            { href: "#jenjang", label: "Jenjang" },
+            { href: "#pengguna", label: "Pengguna" },
         ],
     },
     {
@@ -112,26 +123,29 @@ const FOOTER_COLUMNS = [
         links: [
             { href: "#fitur", label: "Materi dan modul" },
             { href: "#fitur", label: "Tugas dan kuis" },
-            { href: "#fitur", label: "Jadwal dan presensi" },
-            { href: "#fitur", label: "Rekap nilai" },
-        ],
-    },
-    {
-        title: "Jenjang",
-        links: [
-            { href: "#jenjang", label: "SMP / SMA / SMK" },
-            { href: "#jenjang", label: "Perguruan Tinggi" },
+            { href: "#fitur", label: "Jadwal pelajaran" },
+            { href: "#fitur", label: "Nilai dan rapor" },
         ],
     },
     {
         title: "Pengguna",
         links: [
-            { href: "#fitur", label: "Siswa dan mahasiswa" },
-            { href: "#fitur", label: "Guru dan dosen" },
-            { href: "#fitur", label: "Wali kelas" },
+            { href: "#pengguna", label: "Siswa" },
+            { href: "#pengguna", label: "Guru" },
+            { href: "#pengguna", label: "Wali kelas" },
+            { href: "#pengguna", label: "Admin sekolah" },
+        ],
+    },
+    {
+        title: "Akademik",
+        links: [
+            { href: "#fitur", label: "Presensi siswa" },
+            { href: "#fitur", label: "Penilaian dan rapor" },
+            { href: "#fitur", label: "Ujian sekolah" },
         ],
     },
 ];
+
 const WRAP = "mx-auto w-full max-w-[1240px] px-5 sm:px-6";
 const BTN =
     "inline-flex items-center justify-center gap-2 rounded-xl text-[15px] font-semibold leading-tight transition duration-150 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary";
@@ -191,7 +205,7 @@ function Brand() {
                 </span>
 
                 <span className="mt-1 hidden text-xs font-medium text-on-surface-variant sm:block">
-                    E-Learning Akademik
+                    Sistem Informasi Sekolah
                 </span>
             </span>
         </a>
@@ -244,7 +258,7 @@ function Navbar({ dark, onToggleTheme }) {
                         className={`${BTN} ${SIZE_SM} ${BTN_PRIMARY} hidden sm:inline-flex`}
                     >
                         <LogIn size={18} aria-hidden="true" />
-                        Masuk
+                        {LOGIN_LABEL}
                     </Link>
 
                     <button
@@ -282,13 +296,13 @@ function Navbar({ dark, onToggleTheme }) {
                             </a>
                         ))}
 
-                        <a
+                        <Link
                             href={LOGIN_URL}
                             className={`${BTN} ${SIZE_MD} ${BTN_PRIMARY} my-3 w-full sm:hidden`}
                         >
                             <LogIn size={18} aria-hidden="true" />
-                            Masuk
-                        </a>
+                            {LOGIN_LABEL}
+                        </Link>
                     </div>
                 </nav>
             )}
@@ -351,11 +365,11 @@ function HeroMockup() {
                 <div className="rounded-[2rem] border border-outline-variant/70 bg-surface p-5 shadow-2xl shadow-brand-from/10 sm:p-7">
                     <div className="flex items-center justify-between">
                         <p className="font-display text-lg font-bold text-on-surface">
-                            Jadwal hari ini
+                            Jadwal pelajaran hari ini
                         </p>
 
                         <span className="rounded-full bg-secondary-container px-3 py-1 text-xs font-semibold text-on-secondary-container">
-                            3 kelas
+                            {SCHEDULE.length} mapel
                         </span>
                     </div>
 
@@ -406,7 +420,7 @@ function HeroMockup() {
                                 </p>
 
                                 <p className="mt-1 font-display text-lg font-bold leading-snug">
-                                    Laporan Praktikum 4
+                                    Latihan Soal Bab 5
                                 </p>
 
                                 <p className="mt-2 flex items-center gap-1.5 text-xs text-white/90">
@@ -440,7 +454,7 @@ function HeroMockup() {
             </div>
 
             <p className="mt-5 text-center text-xs text-on-surface-variant sm:mt-8">
-                Pratinjau dashboard pembelajaran
+                Pratinjau dashboard siswa
             </p>
         </div>
     );
@@ -465,15 +479,14 @@ function Hero() {
                         id="judul-hero"
                         className="font-display text-[clamp(2.25rem,4.6vw,3.6rem)] font-extrabold leading-[1.08] tracking-tight text-on-surface text-balance motion-safe:animate-rise"
                     >
-                        Satu ruang belajar digital untuk berkembang lebih
-                        terarah
+                        Satu portal sekolah untuk belajar yang lebih terarah
                     </h1>
 
                     <p className="max-w-prose text-lg leading-relaxed text-on-surface-variant text-pretty [animation-delay:80ms] motion-safe:animate-rise">
-                        SmartTech menghubungkan siswa, mahasiswa, dan pengajar
-                        dalam satu sistem informasi e-learning terpadu, dari
-                        materi kelas dan jadwal hingga pengumpulan tugas dan
-                        nilai.
+                        SmartTech menghubungkan siswa, guru, dan pihak sekolah
+                        dalam satu sistem informasi terpadu, dari jadwal
+                        pelajaran dan materi kelas hingga pengumpulan tugas dan
+                        rapor.
                     </p>
 
                     <div className="flex flex-wrap items-center gap-3 [animation-delay:160ms] motion-safe:animate-rise">
@@ -485,10 +498,10 @@ function Hero() {
                         </a>
 
                         <a
-                            href="#jenjang"
+                            href="#pengguna"
                             className={`${BTN} ${SIZE_MD} ${BTN_SECONDARY}`}
                         >
-                            Lihat Jenjang
+                            Lihat Pengguna
                         </a>
                     </div>
 
@@ -554,12 +567,12 @@ function Features() {
             <div className={WRAP}>
                 <div className="mb-12 max-w-2xl">
                     <h2 id="judul-fitur" className={H2}>
-                        Dirancang untuk alur belajar sekolah dan kampus
+                        Dirancang untuk kegiatan belajar mengajar di sekolah
                     </h2>
 
                     <p className="mt-4 text-lg text-on-surface-variant text-pretty">
-                        Setiap modul membantu siswa dan pengajar fokus pada
-                        proses belajar tanpa hambatan administratif.
+                        Setiap fitur membantu siswa dan guru fokus pada proses
+                        belajar tanpa hambatan administratif.
                     </p>
                 </div>
 
@@ -568,8 +581,8 @@ function Features() {
                         <FeatureHead
                             icon={BookOpen}
                             title="Materi dan modul terstruktur"
-                            kicker="Kurikulum per pertemuan"
-                            text="Akses slide presentasi, dokumen PDF, dan video penjelasan guru atau dosen yang tersusun rapi berdasarkan bab dan minggu perkuliahan."
+                            kicker="Materi per pertemuan"
+                            text="Akses slide presentasi, dokumen PDF, dan video penjelasan guru yang tersusun rapi berdasarkan mata pelajaran, bab, dan pertemuan."
                         />
 
                         <ul aria-hidden="true" className="mt-auto grid gap-2.5">
@@ -597,9 +610,9 @@ function Features() {
                     <article className={`${TILE} lg:col-span-2`}>
                         <FeatureHead
                             icon={ClipboardCheck}
-                            title="Tugas, kuis, dan ujian daring"
-                            kicker="Evaluasi otomatis"
-                            text="Kumpulkan berkas sebelum tenggat, kerjakan kuis pilihan ganda atau esai, dan terima umpan balik dari pengajar."
+                            title="Tugas, kuis, dan ujian sekolah"
+                            kicker="Evaluasi terarah"
+                            text="Kumpulkan tugas sebelum tenggat, kerjakan kuis pilihan ganda atau esai, dan terima umpan balik langsung dari guru."
                         />
 
                         <div
@@ -608,7 +621,7 @@ function Features() {
                         >
                             <div className="flex items-center justify-between gap-3 rounded-2xl border border-outline-variant bg-surface p-3">
                                 <span className="text-sm font-medium text-on-surface">
-                                    Laporan Praktikum 4
+                                    Latihan Soal Bab 5
                                 </span>
 
                                 <span className="inline-flex items-center gap-1 text-xs text-on-surface-variant">
@@ -633,9 +646,9 @@ function Features() {
                     <article className={`${TILE} lg:col-span-2`}>
                         <FeatureHead
                             icon={CalendarDays}
-                            title="Jadwal dan presensi"
-                            kicker="Sinkronisasi kalender"
-                            text="Lihat jadwal kelas hari ini, ruang tatap muka atau tautan kelas daring, serta catat kehadiran dengan cepat."
+                            title="Jadwal pelajaran dan presensi"
+                            kicker="Jadwal harian"
+                            text="Lihat jadwal pelajaran hari ini beserta ruang kelasnya, dan catat kehadiran siswa dengan cepat."
                         />
 
                         <div
@@ -660,9 +673,9 @@ function Features() {
                     <article className={`${TILE} lg:col-span-4`}>
                         <FeatureHead
                             icon={TrendingUp}
-                            title="Rekap nilai dan rapor digital"
-                            kicker="Transparansi akademik"
-                            text="Pantau perkembangan nilai tugas, UTS, UAS, hingga IPK atau nilai rapor semester dalam tampilan ringkas dan mudah dipahami."
+                            title="Nilai dan rapor digital"
+                            kicker="Transparansi nilai"
+                            text="Pantau perkembangan nilai tugas, PTS, hingga PAS dan rapor semester dalam tampilan ringkas yang mudah dipahami siswa."
                         />
 
                         <div aria-hidden="true" className="mt-auto">
@@ -694,71 +707,64 @@ function Features() {
     );
 }
 
-function Jenjang() {
+function Pengguna() {
     return (
         <section
-            id="jenjang"
-            aria-labelledby="judul-jenjang"
+            id="pengguna"
+            aria-labelledby="judul-pengguna"
             className={`${SECTION} border-t border-outline-variant`}
         >
             <div className={WRAP}>
                 <div className="mb-12 max-w-2xl">
-                    <h2 id="judul-jenjang" className={H2}>
-                        Siap digunakan di sekolah maupun perguruan tinggi
+                    <h2 id="judul-pengguna" className={H2}>
+                        Satu portal untuk seluruh warga sekolah
                     </h2>
 
                     <p className="mt-4 text-lg text-on-surface-variant text-pretty">
-                        Pilih kategori institusi untuk melihat bagaimana
-                        SmartTech mendukung lingkungan belajar yang relevan.
+                        Setiap pengguna mendapat tampilan dan akses yang sesuai
+                        dengan perannya di sekolah.
                     </p>
                 </div>
 
-                <div className="grid gap-5 md:grid-cols-2">
-                    {JENJANG.map((j) => (
-                        <a
-                            key={j.title}
-                            href="#fitur"
-                            className="group flex flex-col justify-between gap-8 rounded-3xl border border-outline-variant bg-surface-low p-7 transition-colors duration-150 hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:p-9"
+                <div className="grid gap-5 md:grid-cols-3">
+                    {PENGGUNA.map((p) => (
+                        <article
+                            key={p.title}
+                            className="flex flex-col gap-6 rounded-3xl border border-outline-variant bg-surface-low p-7 transition-colors duration-150 hover:border-primary sm:p-8"
                         >
-                            <div className="flex flex-col gap-5">
-                                <span className="grid h-12 w-12 place-items-center rounded-2xl bg-linear-to-br from-brand-from to-brand-to text-white">
-                                    <j.icon size={22} aria-hidden="true" />
-                                </span>
+                            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-linear-to-br from-brand-from to-brand-to text-white">
+                                <p.icon size={22} aria-hidden="true" />
+                            </span>
 
-                                <div>
-                                    <h3 className="font-display text-2xl font-bold leading-snug text-on-surface">
-                                        {j.title}
-                                    </h3>
+                            <div>
+                                <h3 className="font-display text-2xl font-bold leading-snug text-on-surface">
+                                    {p.title}
+                                </h3>
 
-                                    <p className="mt-2 text-[15px] leading-relaxed text-on-surface-variant text-pretty">
-                                        {j.text}
-                                    </p>
-                                </div>
-
-                                <ul className="grid gap-2.5">
-                                    {j.points.map((p) => (
-                                        <li
-                                            key={p}
-                                            className="flex items-center gap-3 text-sm text-on-surface"
-                                        >
-                                            <span className="grid h-5 w-5 flex-none place-items-center rounded-full bg-secondary-container text-primary">
-                                                <Check
-                                                    size={12}
-                                                    strokeWidth={3}
-                                                    aria-hidden="true"
-                                                />
-                                            </span>
-
-                                            {p}
-                                        </li>
-                                    ))}
-                                </ul>
+                                <p className="mt-2 text-[15px] leading-relaxed text-on-surface-variant text-pretty">
+                                    {p.text}
+                                </p>
                             </div>
 
-                            <span className="text-[15px] font-semibold text-primary group-hover:underline">
-                                {j.cta}
-                            </span>
-                        </a>
+                            <ul className="mt-auto grid gap-2.5">
+                                {p.points.map((point) => (
+                                    <li
+                                        key={point}
+                                        className="flex items-start gap-3 text-sm text-on-surface"
+                                    >
+                                        <span className="mt-0.5 grid h-5 w-5 flex-none place-items-center rounded-full bg-secondary-container text-primary">
+                                            <Check
+                                                size={12}
+                                                strokeWidth={3}
+                                                aria-hidden="true"
+                                            />
+                                        </span>
+
+                                        {point}
+                                    </li>
+                                ))}
+                            </ul>
+                        </article>
                     ))}
                 </div>
             </div>
@@ -773,23 +779,23 @@ function FinalCta() {
                 <div className="flex flex-col items-start justify-between gap-8 rounded-3xl bg-[radial-gradient(60%_90%_at_95%_0%,rgba(125,211,252,0.4),transparent_70%),linear-gradient(135deg,#1d4ed8,#0369a1)] p-8 text-white shadow-xl shadow-brand-from/20 sm:p-12 md:flex-row md:items-center">
                     <div className="max-w-xl">
                         <h2 className="font-display text-[1.75rem] font-bold leading-tight text-balance sm:text-3xl">
-                            Temukan pengalaman belajar yang lebih terarah
+                            Mulai belajar dengan lebih terarah
                         </h2>
 
                         <p className="mt-3 text-[15px] leading-relaxed text-white/90 text-pretty">
-                            Akses ruang kelas digital, periksa jadwal terbaru,
-                            dan selesaikan tugas tepat waktu melalui fitur-fitur
-                            SmartTech.
+                            Akses ruang kelas digital, periksa jadwal pelajaran
+                            terbaru, dan kumpulkan tugas tepat waktu melalui
+                            portal sekolah SmartTech.
                         </p>
                     </div>
 
-                    <a
+                    <Link
                         href={LOGIN_URL}
                         className={`${BTN} ${SIZE_MD} flex-none bg-white text-brand-from hover:bg-white/90`}
                     >
                         <LogIn size={18} aria-hidden="true" />
-                        Masuk Sekarang
-                    </a>
+                        {LOGIN_LABEL}
+                    </Link>
                 </div>
             </div>
         </section>
@@ -812,9 +818,9 @@ function Footer() {
                         </p>
 
                         <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-on-surface-variant text-pretty">
-                            Sistem informasi e-learning yang menghubungkan
-                            siswa, mahasiswa, dan pengajar dalam satu ruang
-                            belajar digital yang terarah.
+                            Sistem informasi sekolah yang menghubungkan siswa,
+                            guru, dan pihak sekolah dalam satu ruang belajar
+                            digital yang terarah.
                         </p>
                     </div>
 
@@ -869,10 +875,10 @@ export default function LandingPage() {
 
     return (
         <>
-            <Head title="SmartTech: E-Learning untuk Sekolah dan Kampus">
+            <Head title="SmartTech: Sistem Informasi Sekolah">
                 <meta
                     name="description"
-                    content="SmartTech adalah sistem informasi e-learning yang menghubungkan siswa, mahasiswa, dan pengajar dalam satu portal akademik."
+                    content="SmartTech adalah sistem informasi sekolah yang menghubungkan siswa, guru, dan pihak sekolah dalam satu portal untuk jadwal pelajaran, materi, tugas, presensi, dan rapor."
                 />
             </Head>
 
@@ -892,7 +898,7 @@ export default function LandingPage() {
                 <main id="konten">
                     <Hero />
                     <Features />
-                    <Jenjang />
+                    <Pengguna />
                     <FinalCta />
                 </main>
 

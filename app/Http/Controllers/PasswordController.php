@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -38,7 +37,7 @@ class PasswordController extends Controller
         $user = $request->user();
 
         $user->forceFill([
-            'password' => Hash::make($data['password']),
+            'password' => $data['password'], 
             'must_change_password' => false,
         ])->save();
 

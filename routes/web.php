@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\Student\StudentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use Inertia\Inertia;
@@ -25,18 +26,6 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth', 'auth.session', EncryptHistory::class])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    Route::middleware('password.changed')->group(function () {
-        Route::middleware('role:admin')->prefix('admin')->group(function () {
-            Route::get('/', AdminDashboardController::class)
-                ->name('admin.dashboard');
-        });
-        Route::middleware('role:guru')->prefix('guru')->group(function () {
-            // Route khusus guru
-        });
-        Route::middleware('role:siswa')->prefix('siswa')->group(function () {
-            // Route khusus siswa
-        });
-    });
     Route::get('/ganti-sandi', [PasswordController::class, 'edit'])->name('password.change');
     Route::put('/ganti-sandi', [PasswordController::class, 'update'])
         ->middleware('throttle:6,1')
@@ -48,12 +37,21 @@ Route::middleware(['auth', 'auth.session', EncryptHistory::class])->group(functi
         Route::middleware('role:admin')->prefix('admin')->group(function () {
             Route::get('/', AdminDashboardController::class)->name('admin.dashboard');
             Route::get('/pengguna', [UserController::class, 'index'])->name('admin.users');
-            Route::post('/pengguna', [UserController::class, 'store'])
-                ->middleware('throttle:30,1');
-            Route::put('/pengguna/{user}/password', [UserController::class, 'resetPassword'])
-                ->middleware('throttle:20,1');
-            Route::delete('/pengguna/{user}', [UserController::class, 'destroy'])
-                ->middleware('throttle:20,1');
+            Route::post('/pengguna', [UserController::class, 'store'])->middleware('throttle:30,1');
+            Route::put('/pengguna/{user}/password', [UserController::class, 'resetPassword'])->middleware('throttle:20,1');
+            Route::delete('/pengguna/{user}', [UserController::class, 'destroy'])->middleware('throttle:20,1');
         });
+
+
+        Route::middleware('role:siswa')
+            ->prefix('siswa')
+            ->controller(StudentController::class)
+            ->group(function () {
+                Route::get('/dashboard', 'dashboard')->name('siswa.dashboard');
+                Route::get('/jadwal', 'schedule')->name('siswa.jadwal');
+                Route::get('/tugas', 'tasks')->name('siswa.tugas');
+                Route::get('/nilai', 'grades')->name('siswa.nilai');
+                Route::get('/mapel', 'subjects')->name('siswa.mapel');
+            });
     });
 });

@@ -13,12 +13,24 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        if ($user->role === 'admin') {
-            return redirect()->route('admin.dashboard');
-        }
+        return match ($user->role) {
+            'admin' => redirect()->route('admin.dashboard'),
+            'guru' => Inertia::render('Teacher/Dashboard', [
+                'user' => $this->userProps($user),
+            ]),
+            default => Inertia::render('Student/DashboardStudent', [
+                'user' => $this->userProps($user),
+            ]),
+        };
+    }
 
-        return Inertia::render('Dashboard', [
-            'user' => $user->only('name', 'role', 'identifier', 'email'),
-        ]);
+    private function userProps($user): array
+    {
+        return [
+            'name' => $user->name,
+            'role' => $user->role,
+            'email' => $user->email,
+            'identifier' => $user->id,
+        ];
     }
 }

@@ -22,12 +22,6 @@ import {
 } from "lucide-react";
 import AdminLayout from "../../Components/AdminLayout";
 
-/* ------------------------------------------------------------------ */
-/*  DATA CONTOH                                                        */
-/*  Konstanta di bawah ini sementara. Ganti dengan props dari          */
-/*  controller Laravel saat modul kelas, tugas, dan presensi selesai.  */
-/*  Bagian "Pengguna" sudah memakai data nyata dari props `stats`.     */
-/* ------------------------------------------------------------------ */
 
 const CLASSES = [
     {

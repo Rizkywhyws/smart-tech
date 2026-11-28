@@ -25,6 +25,18 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth', 'auth.session', EncryptHistory::class])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+    Route::middleware('password.changed')->group(function () {
+        Route::middleware('role:admin')->prefix('admin')->group(function () {
+            Route::get('/', AdminDashboardController::class)
+                ->name('admin.dashboard');
+        });
+        Route::middleware('role:guru')->prefix('guru')->group(function () {
+            // Route khusus guru
+        });
+        Route::middleware('role:siswa')->prefix('siswa')->group(function () {
+            // Route khusus siswa
+        });
+    });
     Route::get('/ganti-sandi', [PasswordController::class, 'edit'])->name('password.change');
     Route::put('/ganti-sandi', [PasswordController::class, 'update'])
         ->middleware('throttle:6,1')

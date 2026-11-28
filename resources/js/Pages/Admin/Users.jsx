@@ -24,23 +24,26 @@ import ConfirmModal from "../../Components/ConfirmModal";
 
 const ROLE_LABEL = {
     admin: "Admin",
-    guru: "Guru / Dosen",
+    guru: "Guru",
     siswa: "Siswa",
-    mahasiswa: "Mahasiswa",
 };
 
 const ID_LABEL = {
     admin: "ID Admin (opsional)",
     guru: "NIP",
     siswa: "NIS",
-    mahasiswa: "NIM",
+};
+
+const ID_EXAMPLE = {
+    admin: "Contoh: ADM001",
+    guru: "Contoh: 198501012010011001",
+    siswa: "Contoh: 1234567890",
 };
 
 const ROLE_TONE = {
     admin: "bg-brand-from/15 text-primary",
     guru: "bg-brand-sky/20 text-tertiary",
     siswa: "bg-secondary-container text-on-secondary-container",
-    mahasiswa: "bg-surface-high text-on-surface",
 };
 
 const INPUT =
@@ -201,7 +204,7 @@ function CreateUserForm({ onCreated }) {
                 <Input
                     id="u-identifier"
                     label={ID_LABEL[form.data.role]}
-                    placeholder="Contoh: 2026104011"
+                    placeholder={ID_EXAMPLE[form.data.role]}
                     value={form.data.identifier}
                     onChange={set("identifier")}
                     error={form.errors.identifier}
@@ -215,7 +218,7 @@ function CreateUserForm({ onCreated }) {
                             : "Email (opsional)"
                     }
                     type="email"
-                    placeholder="nama@sekolah.ac.id"
+                    placeholder="nama@sekolah.sch.id"
                     value={form.data.email}
                     onChange={set("email")}
                     error={form.errors.email}
@@ -346,11 +349,11 @@ function UserDetailModal({ user, onClose }) {
         </div>
     );
 }
+
 const ROLE_FILTERS = [
     ["", "Semua peran"],
     ["siswa", "Siswa"],
-    ["mahasiswa", "Mahasiswa"],
-    ["guru", "Guru / Dosen"],
+    ["guru", "Guru"],
     ["admin", "Admin"],
 ];
 
@@ -532,7 +535,6 @@ function Pagination({ meta, onPage }) {
 
 export default function AdminUsers({ users, filters, stats }) {
     const { auth, flash } = usePage().props;
-
     const [q, setQ] = useState(filters.q ?? "");
     const [loading, setLoading] = useState(false);
     const [created, setCreated] = useState(null);
@@ -542,6 +544,8 @@ export default function AdminUsers({ users, filters, stats }) {
     const closeCreated = useCallback(() => setCreated(null), []);
     const closeDetail = useCallback(() => setDetail(null), []);
     const closeTarget = useCallback(() => setTarget(null), []);
+    const [removed, setRemoved] = useState(null);
+    const closeRemoved = useCallback(() => setRemoved(null), []);
 
     const visit = useCallback(
         (patch = {}) => {
@@ -591,7 +595,7 @@ export default function AdminUsers({ users, filters, stats }) {
         const timer = setTimeout(() => visitRef.current({ q: q.trim() }), 350);
 
         return () => clearTimeout(timer);
-    }, [q]); 
+    }, [q]);
 
     const onSort = (column) => {
         const same = filters.sort === column;
@@ -621,10 +625,12 @@ export default function AdminUsers({ users, filters, stats }) {
 
     const confirmRemove = () => {
         if (!target) return;
+        const name = target.name;
 
         router.delete(`/admin/pengguna/${target.id}`, {
             preserveScroll: true,
             onStart: () => setDeleting(true),
+            onSuccess: () => setRemoved(name),
             onFinish: () => {
                 setDeleting(false);
                 setTarget(null);
@@ -638,7 +644,7 @@ export default function AdminUsers({ users, filters, stats }) {
 
             <AdminLayout
                 title="Kelola Pengguna"
-                subtitle="Buat dan kelola akun siswa, mahasiswa, guru, dan admin"
+                subtitle="Buat dan kelola akun siswa, guru, dan admin"
             >
                 <SuccessModal
                     open={created !== null}
@@ -651,8 +657,8 @@ export default function AdminUsers({ users, filters, stats }) {
                     onClose={closeCreated}
                 />
 
-                <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                    {["siswa", "mahasiswa", "guru", "admin"].map((r) => (
+                <div className="grid grid-cols-3 gap-3">
+                    {["siswa", "guru", "admin"].map((r) => (
                         <div
                             key={r}
                             className="rounded-2xl border border-outline-variant bg-surface-low p-4"
@@ -714,7 +720,7 @@ export default function AdminUsers({ users, filters, stats }) {
                                     value={q}
                                     onChange={(e) => setQ(e.target.value)}
                                     maxLength={60}
-                                    placeholder="Cari nama, NIS/NIM/NIP, atau email"
+                                    placeholder="Cari nama, NIS/NIP, atau email"
                                     aria-label="Cari pengguna"
                                     className={`${INPUT} py-2 pl-10 text-sm`}
                                 />
@@ -955,19 +961,7 @@ export default function AdminUsers({ users, filters, stats }) {
                     />
                 </section>
 
-                <UserDetailModal
-                    user={detail}
-                    isSelf={auth?.user?.id === detail?.id}
-                    onClose={closeDetail}
-                    onReset={(u) => {
-                        closeDetail();
-                        resetPassword(u);
-                    }}
-                    onDelete={(u) => {
-                        closeDetail();
-                        setTarget(u);
-                    }}
-                />
+                <UserDetailModal user={detail} onClose={closeDetail} />
 
                 <ConfirmModal
                     open={target !== null}
@@ -980,6 +974,15 @@ export default function AdminUsers({ users, filters, stats }) {
                     processing={deleting}
                     onConfirm={confirmRemove}
                     onClose={closeTarget}
+                />
+
+                <SuccessModal
+                    open={removed !== null}
+                    title="Akun berhasil dihapus"
+                    description={
+                        removed ? `Akun ${removed} sudah dihapus.` : undefined
+                    }
+                    onClose={closeRemoved}
                 />
             </AdminLayout>
         </>

@@ -8,7 +8,6 @@ import {
     EyeOff,
     GraduationCap,
     Info,
-    KeyRound,
     Lock,
     LogIn,
     Mail,
@@ -20,7 +19,7 @@ import {
 import useTheme from "../hooks/useTheme";
 
 const BENEFITS = [
-    "Materi terstruktur dan rekaman kelas",
+    "Materi terstruktur dan rekaman pelajaran",
     "Pengumpulan tugas dan ujian daring",
     "Jadwal, presensi, dan rekap nilai",
 ];
@@ -94,7 +93,7 @@ function PasswordField({ id, label, error, ...props }) {
                     aria-label={
                         show ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"
                     }
-                    className="absolute right-2.5 grid h-8 w-8 cursor-pointer place-items-center rounded-lg text-outline transition-colors hover:text-on-surface"
+                    className="absolute right-2.5 grid h-8 w-8 cursor-pointer place-items-center rounded-lg text-outline transition-colors hover:text-on-surface focus-visible:outline-2 focus-visible:outline-primary"
                 >
                     {show ? (
                         <EyeOff size={18} aria-hidden="true" />
@@ -121,8 +120,28 @@ function Notice({ icon: Icon = Info, children }) {
     );
 }
 
+const LOGIN_ROLES = {
+    siswa: {
+        label: "Siswa",
+        icon: User,
+    },
+    guru: {
+        label: "Guru",
+        icon: GraduationCap,
+    },
+    admin: {
+        label: "Admin",
+        icon: ShieldCheck,
+    },
+};
+
 function LoginForm({ canRegisterAdmin, onSwitch }) {
-    const form = useForm({ identity: "", password: "", remember: false });
+    const form = useForm({
+        role: "siswa",
+        identity: "",
+        password: "",
+        remember: false,
+    });
 
     const change = (key) => (e) => {
         form.setData(
@@ -137,7 +156,7 @@ function LoginForm({ canRegisterAdmin, onSwitch }) {
 
         const next = {};
         if (!form.data.identity.trim())
-            next.identity = "Masukkan NIS, NIM, NIP, atau email Anda.";
+            next.identity = "Masukkan NIS, NIP, atau email Anda.";
         if (!form.data.password) next.password = "Masukkan kata sandi Anda.";
 
         if (Object.keys(next).length) {
@@ -160,18 +179,49 @@ function LoginForm({ canRegisterAdmin, onSwitch }) {
                 </h2>
 
                 <p className="mt-1 text-[13px] text-on-surface-variant">
-                    Gunakan NIS, NIM, NIP, atau email yang diberikan institusi
-                    Anda.
+                    Gunakan NIS, NIP, atau email yang diberikan sekolah Anda.
                 </p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+                {Object.entries(LOGIN_ROLES).map(([key, role]) => {
+                    const Icon = role.icon;
+                    const active = form.data.role === key;
+
+                    return (
+                        <button
+                            key={key}
+                            type="button"
+                            onClick={() => {
+                                form.setData({
+                                    ...form.data,
+                                    role: key,
+                                    identity: "",
+                                });
+                                form.clearErrors("identity");
+                            }}
+                            aria-pressed={active}
+                            className={`flex flex-col items-center gap-2 rounded-xl border p-3 text-sm font-semibold transition ${
+                                active
+                                    ? "border-primary bg-primary/10 text-primary"
+                                    : "border-outline-variant text-on-surface-variant hover:bg-surface-low"
+                            }`}
+                        >
+                            <Icon size={21} aria-hidden="true" />
+                            {role.label}
+                        </button>
+                    );
+                })}
             </div>
 
             <form onSubmit={submit} noValidate className="flex flex-col gap-4">
                 <Field
                     id="login-identity"
-                    label="NIS / NIM / NIP atau Email"
-                    icon={User}
-                    type="text"
-                    placeholder="2026104011 atau nama@kampus.ac.id"
+                    label="Email"
+                    icon={Mail}
+                    type="email"
+                    inputMode="email"
+                    placeholder="nama@sekolah.sch.id"
                     autoComplete="username"
                     value={form.data.identity}
                     onChange={change("identity")}
@@ -204,7 +254,9 @@ function LoginForm({ canRegisterAdmin, onSwitch }) {
                     className={BTN_PRIMARY}
                 >
                     <LogIn size={18} aria-hidden="true" />
-                    {form.processing ? "Memproses..." : "Masuk ke Portal"}
+                    {form.processing
+                        ? "Memproses..."
+                        : `Masuk sebagai ${LOGIN_ROLES[form.data.role].label}`}
                 </button>
             </form>
 
@@ -222,9 +274,8 @@ function LoginForm({ canRegisterAdmin, onSwitch }) {
                 </Notice>
             ) : (
                 <Notice>
-                    Belum memiliki akun? Akun siswa, mahasiswa, dan guru dibuat
-                    oleh admin institusi. Hubungi admin sekolah atau kampus
-                    Anda.
+                    Belum memiliki akun? Akun siswa dan guru dibuat oleh admin
+                    sekolah. Hubungi admin sekolah Anda.
                 </Notice>
             )}
         </div>
@@ -283,7 +334,7 @@ function RegisterAdminForm({ onSwitch }) {
                 </h2>
 
                 <p className="mt-1 text-[13px] text-on-surface-variant">
-                    Admin mengelola akun siswa, mahasiswa, dan guru.
+                    Admin mengelola akun siswa dan guru.
                 </p>
             </div>
 
@@ -311,7 +362,7 @@ function RegisterAdminForm({ onSwitch }) {
                     icon={Mail}
                     type="email"
                     inputMode="email"
-                    placeholder="admin@sekolah.ac.id"
+                    placeholder="admin@sekolah.sch.id"
                     autoComplete="email"
                     value={form.data.email}
                     onChange={change("email")}
@@ -432,7 +483,7 @@ export default function Login({ canRegisterAdmin = false }) {
                         <aside className="flex flex-col justify-between gap-10 bg-linear-to-br from-brand-from to-brand-to p-8 text-white sm:p-10 lg:col-span-5">
                             <div className="flex flex-col gap-4">
                                 <span className="self-start rounded-full bg-white px-3 py-1 text-xs font-bold text-brand-from">
-                                    Portal Akademik
+                                    Portal Sekolah
                                 </span>
 
                                 <h1 className="font-display text-[1.75rem] font-extrabold leading-tight text-balance">
@@ -440,9 +491,9 @@ export default function Login({ canRegisterAdmin = false }) {
                                 </h1>
 
                                 <p className="text-[15px] leading-relaxed text-white/90 text-pretty">
-                                    Masuk dengan akun yang diberikan institusi
-                                    Anda untuk mengikuti kelas, mengumpulkan
-                                    tugas, dan memantau perkembangan akademik.
+                                    Masuk dengan akun yang diberikan sekolah
+                                    Anda untuk mengikuti pelajaran, mengumpulkan
+                                    tugas, dan memantau perkembangan belajar.
                                 </p>
                             </div>
 
@@ -515,7 +566,7 @@ export default function Login({ canRegisterAdmin = false }) {
                 <footer className={`${WRAP} text-center`}>
                     <p className="text-[13px] text-on-surface-variant">
                         © {new Date().getFullYear()} SmartTech · Sistem
-                        Informasi E-Learning Sekolah dan Kampus
+                        Informasi E-Learning Sekolah
                     </p>
                 </footer>
             </div>

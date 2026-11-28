@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,17 +11,29 @@ use Illuminate\Support\Facades\Cache;
 
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
-
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    protected $primaryKey = 'id';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    public static function makeId(?string $role): string
+    {
+        $prefix = match ($role) {
+            'admin' => 'AD',
+            'guru' => 'GR',
+            'siswa' => 'SW',
+            default => throw new \InvalidArgumentException('Role tidak valid.'),
+        };
+
+        do {
+            $id = sprintf('%s%04d', $prefix, random_int(0, 9999));
+        } while (static::where('id', $id)->exists());
+
+        return $id;
+    }
+
     protected function casts(): array
     {
         return [
@@ -40,10 +51,11 @@ class User extends Authenticatable
             }
         });
 
-        static::deleted(fn() => Cache::forget('user.role-counts'));
+        static::deleted(function () {
+            Cache::forget('user.role-counts');
+        });
     }
 
-    /** @return array<string, int> */
     public static function roleCounts(): array
     {
         return Cache::remember('user.role-counts', 300, fn() => static::query()

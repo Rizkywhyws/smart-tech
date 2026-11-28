@@ -1,8 +1,8 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,43 +15,52 @@ use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Contracts\Cache\LockTimeoutException;
 
 class AuthController extends Controller
 {
     public function showLogin(): Response
     {
         return Inertia::render('Login', [
-            'canRegisterAdmin' => ! User::where('role', 'admin')->exists(),
+            'canRegisterAdmin' => !User::where('role', 'admin')->exists(),
         ]);
     }
 
     public function login(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'identity' => ['required', 'string', 'max:255'],
+            'role' => ['required', 'in:siswa,guru,admin'],
+            'identity' => ['required', 'email:rfc', 'max:255'],
             'password' => ['required', 'string', 'max:255'],
+            'remember' => ['sometimes', 'boolean'],
         ], [
-            'identity.required' => 'Masukkan NIS, NIM, NIP, atau email Anda.',
+            'role.required' => 'Pilih jenis akun Anda.',
+            'role.in' => 'Jenis akun tidak valid.',
+            'identity.required' => 'Masukkan email Anda.',
+            'identity.email' => 'Masukkan alamat email yang valid.',
             'password.required' => 'Masukkan kata sandi Anda.',
         ]);
 
-        $identity = trim($data['identity']);
+        $email = Str::lower(trim($data['identity']));
         $ip = $request->ip();
-
-        $perAccount = 'login:' . Str::lower($identity) . '|' . $ip;
+        $perAccount = 'login:' . $email . '|' . $ip;
         $perIp = 'login-ip:' . $ip;
 
-        if (RateLimiter::tooManyAttempts($perAccount, 5) || RateLimiter::tooManyAttempts($perIp, 20)) {
-            $seconds = max(RateLimiter::availableIn($perAccount), RateLimiter::availableIn($perIp));
+        if (
+            RateLimiter::tooManyAttempts($perAccount, 5) ||
+            RateLimiter::tooManyAttempts($perIp, 20)
+        ) {
+            $seconds = max(
+                RateLimiter::availableIn($perAccount),
+                RateLimiter::availableIn($perIp)
+            );
 
             throw ValidationException::withMessages([
-                'identity' => "Terlalu banyak percobaan. Coba lagi dalam {$seconds} detik.",
+                'identity' => "Terlalu banyak percobaan login. Coba lagi dalam {$seconds} detik.",
             ]);
         }
 
-        $user = User::where('identifier', $identity)
-            ->orWhere('email', Str::lower($identity))
+        $user = User::where('email', $email)
+            ->where('role', $data['role'])
             ->first();
 
         if ($user) {
@@ -61,24 +70,25 @@ class AuthController extends Controller
             $valid = false;
         }
 
-        if (! $valid) {
+        if (!$valid) {
             RateLimiter::hit($perAccount, 60);
             RateLimiter::hit($perIp, 60);
 
             Log::warning('Login gagal', [
                 'ip' => $ip,
-                'id_hash' => substr(hash('sha256', Str::lower($identity)), 0, 12),
+                'id_hash' => substr(hash('sha256', $email), 0, 12),
             ]);
 
             throw ValidationException::withMessages([
-                'identity' => 'NIS/NIM/NIP/email atau kata sandi salah.',
+                'identity' => 'Email, kata sandi, atau jenis akun tidak sesuai.',
             ]);
         }
 
         RateLimiter::clear($perAccount);
-
         if (Hash::needsRehash($user->password)) {
-            $user->forceFill(['password' => Hash::make($data['password'])])->save();
+            $user->forceFill([
+                'password' => Hash::make($data['password']),
+            ])->save();
         }
 
         Auth::login($user, $request->boolean('remember'));
@@ -96,13 +106,26 @@ class AuthController extends Controller
         );
 
         if (is_string($request->input('email'))) {
-            $request->merge(['email' => Str::lower(trim($request->input('email')))]);
+            $request->merge([
+                'email' => Str::lower(trim($request->input('email'))),
+            ]);
         }
 
+        // Validasi data pendaftaran.
         $data = $request->validate([
             'name' => ['required', 'string', 'max:120'],
-            'email' => ['required', 'email:rfc', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'confirmed', Password::defaults()],
+            'email' => [
+                'required',
+                'email:rfc',
+                'max:255',
+                'unique:users,email',
+            ],
+            'password' => [
+                'required',
+                'string',
+                'confirmed',
+                Password::defaults(),
+            ],
         ], [
             'required' => ':attribute wajib diisi.',
             'email.email' => 'Masukkan email yang valid.',
@@ -118,43 +141,48 @@ class AuthController extends Controller
         ]);
 
         try {
-            $user = Cache::lock('register-admin', 10)->block(5, function () use ($data) {
-                abort_if(
-                    User::where('role', 'admin')->exists(),
-                    403,
-                    'Admin sudah terdaftar. Minta admin untuk membuatkan akun.'
-                );
+            $user = Cache::lock('register-admin', 10)
+                ->block(5, function () use ($data) {
 
-                $user = new User();
-                $user->forceFill([
-                    'name' => trim($data['name']),
-                    'email' => $data['email'],
-                    'role' => 'admin',
-                    'password' => Hash::make($data['password']),
-                ])->save();
+                    abort_if(
+                        User::where('role', 'admin')->exists(),
+                        403,
+                        'Admin sudah terdaftar. Minta admin untuk membuatkan akun.'
+                    );
 
-                return $user;
-            });
+                    $user = new User();
+
+                    $user->forceFill([
+                        'name' => trim($data['name']),
+                        'email' => $data['email'],
+                        'role' => 'admin',
+                        'password' => Hash::make($data['password']),
+                    ])->save();
+
+                    return $user;
+                });
+
         } catch (LockTimeoutException) {
             abort(429, 'Server sedang sibuk, coba lagi sebentar.');
         }
 
-        Log::info('Admin pertama terdaftar', ['user' => $user->id, 'ip' => $request->ip()]);
+        Log::info('Admin pertama terdaftar', [
+            'user' => $user->id,
+            'ip' => $request->ip(),
+        ]);
 
         Auth::login($user);
+
         $request->session()->regenerate();
 
         return redirect()->route('dashboard');
     }
 
-
     public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
         Inertia::clearHistory();
 
         return redirect('/');

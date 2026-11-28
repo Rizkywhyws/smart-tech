@@ -8,58 +8,65 @@ import {
     CalendarCheck,
     ClipboardCheck,
     Clock,
-    Info,
+    KeyRound,
     MapPin,
     Presentation,
     Radio,
     School,
     Search,
+    ShieldCheck,
     TrendingDown,
-    UserCheck,
     UserX,
     Users,
     Video,
 } from "lucide-react";
 import AdminLayout from "../../Components/AdminLayout";
 
+/* ------------------------------------------------------------------ */
+/*  DATA CONTOH                                                        */
+/*  Konstanta di bawah ini sementara. Ganti dengan props dari          */
+/*  controller Laravel saat modul kelas, tugas, dan presensi selesai.  */
+/*  Bagian "Pengguna" sudah memakai data nyata dari props `stats`.     */
+/* ------------------------------------------------------------------ */
+
 const CLASSES = [
     {
-        code: "IF-204",
-        title: "Struktur Data dan Algoritma",
-        meta: "Kampus · Semester 3",
-        level: "Kampus",
-        teacher: "Dr. Hendra Wijaya",
-        enrolled: 42,
-        capacity: 45,
-        status: "Aktif",
-    },
-    {
         code: "MAT-11A",
-        title: "Matematika Lanjut",
-        meta: "Sekolah · Kelas XI IPA",
-        level: "Sekolah",
+        title: "Matematika",
+        meta: "Kelas XI IPA",
+        grade: "XI",
         teacher: "Siti Rahmawati, S.Pd.",
         enrolled: 34,
         capacity: 36,
         status: "Aktif",
     },
     {
-        code: "SI-301",
-        title: "Basis Data Terdistribusi",
-        meta: "Kampus · Semester 5",
-        level: "Kampus",
-        teacher: "Bima Santoso, M.Kom.",
-        enrolled: 38,
-        capacity: 40,
+        code: "FIS-12B",
+        title: "Fisika",
+        meta: "Kelas XII IPA",
+        grade: "XII",
+        teacher: "Arif Nugroho, M.Pd.",
+        enrolled: 31,
+        capacity: 36,
+        status: "Aktif",
+    },
+    {
+        code: "INF-10A",
+        title: "Informatika",
+        meta: "Kelas X",
+        grade: "X",
+        teacher: "Bima Santoso, S.Kom.",
+        enrolled: 35,
+        capacity: 36,
         status: "Ujian",
     },
     {
-        code: "FIS-12B",
-        title: "Fisika Modern",
-        meta: "Sekolah · Kelas XII IPA",
-        level: "Sekolah",
-        teacher: "Arif Nugroho, M.Pd.",
-        enrolled: 31,
+        code: "BIN-11B",
+        title: "Bahasa Indonesia",
+        meta: "Kelas XI IPS",
+        grade: "XI",
+        teacher: "Rina Marlina, S.Pd.",
+        enrolled: 30,
         capacity: 36,
         status: "Aktif",
     },
@@ -100,6 +107,7 @@ const ACADEMIC = [
     },
 ];
 
+// 14 hari terakhir: 7 hari sebelumnya + 7 hari terbaru, supaya bisa dibandingkan.
 const ACTIVITY = {
     tugas: {
         label: "Tugas",
@@ -124,7 +132,7 @@ const SCHEDULE_TODAY = [
         start: "07:30",
         end: "09:10",
         code: "MAT-11A",
-        title: "Matematika Lanjut",
+        title: "Matematika",
         teacher: "Siti Rahmawati, S.Pd.",
         room: "Ruang 3.2",
         mode: "Tatap muka",
@@ -134,32 +142,32 @@ const SCHEDULE_TODAY = [
     {
         start: "09:30",
         end: "11:10",
-        code: "IF-204",
-        title: "Struktur Data dan Algoritma",
-        teacher: "Dr. Hendra Wijaya",
+        code: "INF-10A",
+        title: "Informatika",
+        teacher: "Bima Santoso, S.Kom.",
         room: "Lab Komputer 2",
         mode: "Tatap muka",
-        enrolled: 42,
-        present: 39,
+        enrolled: 35,
+        present: 32,
     },
     {
         start: "13:00",
         end: "14:40",
-        code: "SI-301",
-        title: "Basis Data Terdistribusi",
-        teacher: "Bima Santoso, M.Kom.",
+        code: "BIN-11B",
+        title: "Bahasa Indonesia",
+        teacher: "Rina Marlina, S.Pd.",
         room: "Kelas daring",
         mode: "Daring",
-        enrolled: 38,
-        present: 36,
+        enrolled: 30,
+        present: 28,
     },
     {
         start: "15:00",
         end: "16:30",
         code: "FIS-12B",
-        title: "Fisika Modern",
+        title: "Fisika",
         teacher: "Arif Nugroho, M.Pd.",
-        room: "Ruang 2.1",
+        room: "Lab IPA",
         mode: "Tatap muka",
         enrolled: 31,
         present: 22,
@@ -169,31 +177,31 @@ const SCHEDULE_TODAY = [
 const ASSIGNMENTS = [
     {
         title: "Laporan Praktikum 4",
-        course: "Basis Data Terdistribusi",
-        teacher: "Bima Santoso, M.Kom.",
+        course: "Informatika",
+        teacher: "Bima Santoso, S.Kom.",
         dueInHours: 20,
         submitted: 31,
-        total: 38,
+        total: 35,
     },
     {
         title: "Kuis 5: Integral",
-        course: "Matematika Lanjut",
+        course: "Matematika",
         teacher: "Siti Rahmawati, S.Pd.",
         dueInHours: 46,
         submitted: 20,
         total: 34,
     },
     {
-        title: "Proyek Akhir Modul 2",
-        course: "Struktur Data dan Algoritma",
-        teacher: "Dr. Hendra Wijaya",
+        title: "Teks Eksposisi",
+        course: "Bahasa Indonesia",
+        teacher: "Rina Marlina, S.Pd.",
         dueInHours: 96,
         submitted: 12,
-        total: 42,
+        total: 30,
     },
     {
-        title: "Esai Fisika Kuantum",
-        course: "Fisika Modern",
+        title: "Esai Hukum Newton",
+        course: "Fisika",
         teacher: "Arif Nugroho, M.Pd.",
         dueInHours: 150,
         submitted: 9,
@@ -204,36 +212,35 @@ const ASSIGNMENTS = [
 const ATTENTION = [
     {
         icon: UserX,
-        title: "Kimia Dasar (KIM-10C)",
-        note: "Belum ada pengajar yang ditugaskan",
+        title: "Kimia (KIM-10C)",
+        note: "Belum ada guru yang ditugaskan",
         tone: "error",
     },
     {
-        icon: UserCheck,
-        title: "5 akun pengajar menunggu verifikasi",
-        note: "Mereka belum bisa membuat kelas sebelum disetujui",
-        tone: "error",
+        icon: KeyRound,
+        title: "5 akun belum mengganti kata sandi sementara",
+        note: "Mereka belum pernah masuk sejak akun dibuat atau direset",
+        tone: "warn",
     },
     {
         icon: Users,
-        title: "Struktur Data (IF-204)",
-        note: "Kapasitas hampir penuh, 42 dari 45 peserta",
+        title: "Informatika (INF-10A)",
+        note: "Kapasitas hampir penuh, 35 dari 36 siswa",
         tone: "warn",
     },
     {
         icon: TrendingDown,
-        title: "Fisika Modern (FIS-12B)",
+        title: "Fisika (FIS-12B)",
         note: "Kehadiran 71%, di bawah batas 80%",
         tone: "warn",
     },
 ];
 
-const FILTERS = ["Semua", "Sekolah", "Kampus"];
+const FILTERS = ["Semua", "X", "XI", "XII"];
 
 const DEFAULT_STATS = {
     total: 0,
     siswa: 0,
-    mahasiswa: 0,
     guru: 0,
     admin: 0,
     thisWeek: 0,
@@ -242,6 +249,9 @@ const DEFAULT_STATS = {
 const CARD =
     "rounded-3xl border border-outline-variant bg-surface-low shadow-sm";
 
+/* ------------------------------------------------------------------ */
+/*  Hooks dan helper                                                   */
+/* ------------------------------------------------------------------ */
 
 function useCountUp(target, ms = 700) {
     const [value, setValue] = useState(0);
@@ -299,6 +309,10 @@ function dueLabel(hours) {
 
 const sum = (arr) => arr.reduce((a, b) => a + b, 0);
 
+/* ------------------------------------------------------------------ */
+/*  Komponen dasar                                                     */
+/* ------------------------------------------------------------------ */
+
 function SectionHeading({ id, title, description, badge }) {
     return (
         <div>
@@ -342,26 +356,6 @@ function CardHeader({ title, description, action }) {
             </div>
 
             {action}
-        </div>
-    );
-}
-
-function SampleNotice() {
-    return (
-        <div className="flex items-start gap-3 rounded-2xl border border-outline-variant bg-surface-low px-4 py-3 text-[13px] leading-relaxed text-on-surface-variant">
-            <Info
-                size={17}
-                aria-hidden="true"
-                className="mt-0.5 flex-none text-primary"
-            />
-
-            <p>
-                <span className="font-semibold text-on-surface">
-                    Data contoh.
-                </span>{" "}
-                Angka pada bagian ini belum berasal dari database dan akan
-                diganti setelah modul kelas, tugas, dan presensi selesai.
-            </p>
         </div>
     );
 }
@@ -853,6 +847,10 @@ function LiveClasses() {
     );
 }
 
+/* ------------------------------------------------------------------ */
+/*  Tabel kelas                                                        */
+/* ------------------------------------------------------------------ */
+
 function StatusBadge({ status }) {
     const tone =
         status === "Ujian"
@@ -901,7 +899,7 @@ function ClassesTable() {
 
         return CLASSES.filter(
             (c) =>
-                (filter === "Semua" || c.level === filter) &&
+                (filter === "Semua" || c.grade === filter) &&
                 (!term ||
                     `${c.code} ${c.title} ${c.teacher}`
                         .toLowerCase()
@@ -918,11 +916,11 @@ function ClassesTable() {
             <div className="flex flex-col gap-4 border-b border-outline-variant p-6">
                 <CardHeader
                     title="Daftar Kelas Aktif"
-                    description="Pantau kapasitas peserta dan status perkuliahan"
+                    description="Pantau kapasitas siswa dan status pembelajaran"
                     action={
                         <div
                             role="tablist"
-                            aria-label="Filter jenjang kelas"
+                            aria-label="Filter tingkat kelas"
                             className="inline-flex gap-1 rounded-xl border border-outline-variant bg-surface p-1"
                         >
                             {FILTERS.map((f) => (
@@ -938,7 +936,7 @@ function ClassesTable() {
                                             : "text-on-surface-variant hover:text-on-surface"
                                     }`}
                                 >
-                                    {f}
+                                    {f === "Semua" ? f : `Kelas ${f}`}
                                 </button>
                             ))}
                         </div>
@@ -946,7 +944,7 @@ function ClassesTable() {
                 />
 
                 <label className="relative block sm:max-w-sm">
-                    <span className="sr-only">Cari kelas atau pengajar</span>
+                    <span className="sr-only">Cari kelas atau guru</span>
 
                     <Search
                         size={16}
@@ -958,7 +956,7 @@ function ClassesTable() {
                         type="search"
                         value={q}
                         onChange={(e) => setQ(e.target.value)}
-                        placeholder="Cari kode, mata kuliah, atau pengajar"
+                        placeholder="Cari kode, mata pelajaran, atau guru"
                         className="w-full rounded-xl border border-outline-variant bg-surface py-2.5 pl-10 pr-4 text-sm text-on-surface placeholder:text-outline focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25"
                     />
                 </label>
@@ -972,7 +970,7 @@ function ClassesTable() {
 
             {rows.length > 0 && (
                 <>
-                    {}
+                    {/* Layar kecil: kartu */}
                     <ul className="divide-y divide-outline-variant/60 md:hidden">
                         {rows.map((c) => (
                             <li key={c.code} className="flex flex-col gap-3 p-5">
@@ -995,7 +993,7 @@ function ClassesTable() {
                                 </div>
 
                                 <p className="text-xs text-on-surface-variant">
-                                    Pengajar:{" "}
+                                    Guru:{" "}
                                     <span className="font-semibold text-on-surface">
                                         {c.teacher}
                                     </span>
@@ -1020,7 +1018,7 @@ function ClassesTable() {
                                         Mata Pelajaran
                                     </th>
                                     <th className="px-3 py-3 font-bold">
-                                        Pengajar
+                                        Guru
                                     </th>
                                     <th className="px-3 py-3 font-bold">
                                         Kapasitas
@@ -1076,6 +1074,10 @@ function ClassesTable() {
     );
 }
 
+/* ------------------------------------------------------------------ */
+/*  Halaman                                                            */
+/* ------------------------------------------------------------------ */
+
 export default function Dashboard({ stats: statsProp }) {
     const { props } = usePage();
     const stats = { ...DEFAULT_STATS, ...statsProp };
@@ -1128,22 +1130,22 @@ export default function Dashboard({ stats: statsProp }) {
                             <Kpi
                                 label="Siswa"
                                 value={stats.siswa}
-                                hint="SMP / SMA / SMK"
+                                hint="Akun peserta didik"
                                 icon={School}
                             />
 
                             <Kpi
-                                label="Mahasiswa"
-                                value={stats.mahasiswa}
-                                hint="Perguruan tinggi"
-                                icon={Users}
+                                label="Guru"
+                                value={stats.guru}
+                                hint="Akun pengajar"
+                                icon={Presentation}
                             />
 
                             <Kpi
-                                label="Guru / Dosen"
-                                value={stats.guru}
-                                hint={`${stats.admin} admin terdaftar`}
-                                icon={Presentation}
+                                label="Admin"
+                                value={stats.admin}
+                                hint="Akun pengelola portal"
+                                icon={ShieldCheck}
                             />
                         </div>
                     </section>
@@ -1152,6 +1154,12 @@ export default function Dashboard({ stats: statsProp }) {
                         aria-labelledby="sec-akademik"
                         className="flex flex-col gap-6"
                     >
+                        <SectionHeading
+                            id="sec-akademik"
+                            title="Kegiatan Akademik"
+                            description="Kondisi kelas, tugas, presensi, dan nilai di seluruh portal"
+                            badge="Data contoh"
+                        />
 
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                             {ACADEMIC.map((m) => (
@@ -1180,4 +1188,4 @@ export default function Dashboard({ stats: statsProp }) {
             </AdminLayout>
         </>
     );
-}
+}   

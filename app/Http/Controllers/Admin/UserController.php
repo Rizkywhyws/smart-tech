@@ -18,7 +18,7 @@ use Inertia\Response;
 
 class UserController extends Controller
 {
-    private const ROLES = ['admin', 'guru', 'siswa', 'mahasiswa'];
+    private const ROLES = ['admin', 'guru', 'siswa'];
 
     public function index(Request $request): Response
     {
@@ -51,6 +51,7 @@ class UserController extends Controller
                 'created_at',
                 'updated_at',
             ])
+            ->whereIn('role', self::ROLES)
             ->when($q !== '', fn($query) => $query->where(function ($w) use ($like) {
                 $w->where('name', 'like', $like)
                     ->orWhere('identifier', 'like', $like)
@@ -106,59 +107,37 @@ class UserController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $clean = fn($v) => is_string($v) && trim($v) !== '' ? trim($v) : null;
-        $email = $clean($request->input('email'));
-
-        $request->merge([
-            'email' => $email ? Str::lower($email) : null,
-            'identifier' => $clean($request->input('identifier')),
-        ]);
-
-        $isAdmin = fn() => $request->input('role') === 'admin';
-
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:120'],
+            'name' => ['required', 'string', 'max:255'],
             'role' => ['required', Rule::in(self::ROLES)],
-            'identifier' => [
-                Rule::requiredIf(fn() => ! $isAdmin()),
-                'nullable',
-                'string',
-                'max:40',
-                'regex:/^[A-Za-z0-9._-]+$/',
-                'unique:users,identifier',
-            ],
-            'email' => [
-                Rule::requiredIf($isAdmin),
-                'nullable',
-                'email:rfc',
-                'max:255',
-                'unique:users,email',
-            ],
+            'identifier' => ['nullable', 'string', 'max:40', 'unique:users,identifier'],
+            'email' => ['nullable', 'email', 'max:255', 'unique:users,email'],
             'password' => ['nullable', 'string', Password::defaults()],
-        ], [
-            'required' => ':attribute wajib diisi.',
-            'unique' => ':attribute sudah terdaftar.',
-            'email' => 'Masukkan email yang valid.',
-            'identifier.regex' => 'ID hanya boleh berisi huruf, angka, titik, garis bawah, dan strip.',
-            'password.min' => 'Kata sandi minimal 8 karakter.',
-            'password.mixed' => 'Kata sandi harus memuat huruf besar dan kecil.',
-            'password.numbers' => 'Kata sandi harus memuat angka.',
-        ], [
-            'name' => 'Nama',
-            'identifier' => 'NIS / NIM / NIP',
-            'email' => 'Email',
         ]);
 
-        $generated = blank($data['password'] ?? null);
-        $plain = $generated ? Str::password(14, symbols: false) : $data['password'];
+        $data['name'] = trim($data['name']);
+
+        $data['email'] = filled($data['email'] ?? null)
+            ? strtolower(trim($data['email']))
+            : null;
+
+        $data['identifier'] = filled($data['identifier'] ?? null)
+            ? trim($data['identifier'])
+            : null;
+
+        $password = filled($data['password'] ?? null)
+            ? $data['password']
+            : Str::password(14, symbols: false);
 
         $user = new User();
+
         $user->forceFill([
+            'id' => User::makeId($data['role']),
             'name' => $data['name'],
             'role' => $data['role'],
-            'identifier' => $data['identifier'] ?? null,
-            'email' => $data['email'] ?? null,
-            'password' => Hash::make($plain),
+            'identifier' => $data['identifier'],
+            'email' => $data['email'],
+            'password' => Hash::make($password),
             'must_change_password' => true,
         ])->save();
 
@@ -168,17 +147,13 @@ class UserController extends Controller
             'role' => $user->role,
         ]);
 
-        $flash = ['success' => "Akun {$user->name} berhasil dibuat."];
-
-        if ($generated) {
-            $flash['generated'] = [
-                'name' => $user->name,
-                'login' => $user->identifier ?? $user->email,
-                'password' => $plain,
-            ];
-        }
-
-        return back()->with($flash);
+        return back()->with('success', [
+            'message' => 'Akun berhasil dibuat.',
+            'credentials' => [
+                'id' => $user->id,
+                'password' => $password,
+            ],
+        ]);
     }
 
     public function resetPassword(Request $request, User $user): RedirectResponse
@@ -224,6 +199,7 @@ class UserController extends Controller
 
         return back()->with('success', "Akun {$name} dihapus.");
     }
+
     private function endSessions(User $user): void
     {
         DB::table('sessions')->where('user_id', $user->id)->delete();

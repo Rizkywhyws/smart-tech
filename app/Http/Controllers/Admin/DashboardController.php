@@ -16,17 +16,6 @@ class DashboardController extends Controller
             ->groupBy('role')
             ->pluck('total', 'role');
 
-        $recent = User::query()
-            ->latest('id')
-            ->take(6)
-            ->get()
-            ->map(fn (User $u) => [
-                'id' => $u->id,
-                'name' => $u->name,
-                'role' => $u->role,
-                'at' => $u->created_at?->diffForHumans(),
-            ]);
-
         return Inertia::render('Admin/Dashboard', [
             'stats' => [
                 'total' => (int) $counts->sum(),
@@ -36,7 +25,6 @@ class DashboardController extends Controller
                 'admin' => (int) ($counts['admin'] ?? 0),
                 'thisWeek' => User::where('created_at', '>=', now()->subDays(7))->count(),
             ],
-            'recent' => $recent,
         ]);
     }
 }
